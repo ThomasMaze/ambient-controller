@@ -1,7 +1,6 @@
 unsigned long previousTime = 0;
 int outState = LOW;
-int potVal = 0;
-const int potPin = A6, gatePin = D2;
+const int potPin = A6, gatePin = D2, scaleSelector = D7;
 int noteValue = 0;
 
 //1V/oct and 12 semi-tones/oct => 1 semi-tones = 1/12 V = 0.083 V
@@ -32,6 +31,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(gatePin, OUTPUT);
   pinMode(potPin, INPUT);
+  pinMode(scaleSelector, INPUT);
   analogWriteResolution(12);
 }
 
@@ -41,9 +41,7 @@ void loop() {
   if(outState == LOW)
   {
     outState = HIGH;
-    int dacValue = major[random(8)]*semiTone + 2*octave;
-   
-    analogWrite(DAC, dacValue);
+    writeRandomNoteToDAC();
   }
   else
   {
@@ -52,7 +50,18 @@ void loop() {
 
   digitalWrite(LED_BUILTIN, outState);
   digitalWrite(gatePin, outState);
-  
-  potVal = analogRead(potPin);
-  delay(1023 - potVal);
+
+  delay(1023 - analogRead(potPin));
+}
+
+void writeRandomNoteToDAC()
+{
+    int dacValue = noteSelect() * semiTone + 2 * octave;
+   
+    analogWrite(DAC, dacValue);
+}
+
+int noteSelect()
+{
+  return scaleSelector ? major[random(8)] : minor[random(8)];
 }
