@@ -63,5 +63,5 @@ void writeRandomNoteToDAC()
 
 int noteSelect()
 {
-  return scaleSelector ? major[random(8)] : minor[random(8)];
+  return digitalRead(scaleSelector) ? major[random(8)] : minor[random(8)];
 }
